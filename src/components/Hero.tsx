@@ -12,26 +12,16 @@ export default function Hero() {
   const ctaRef = useRef<HTMLButtonElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
 
-  // Character reveal texts
   const line1Text = "ONE'O'ONE";
   const line2Text = "AGENCY";
 
   useEffect(() => {
-    // --- 1. Three.js Particle Background Setup ---
     if (!canvasRef.current) return;
 
     const scene = new THREE.Scene();
-    
-    // Camera
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 100;
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
       alpha: true,
@@ -40,23 +30,19 @@ export default function Hero() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Particle Geometry
-    const particleCount = 2000;
+    const particleCount = window.innerWidth < 768 ? 800 : 2000;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
-    // Color choices: Neon blue (#00f0ff) and Neon violet (#8b5cf6)
     const colorBlue = new THREE.Color('#00f0ff');
     const colorViolet = new THREE.Color('#8b5cf6');
 
     for (let i = 0; i < particleCount * 3; i += 3) {
-      // Spread positions in a sphere/cube region
-      positions[i] = (Math.random() - 0.5) * 220;     // X
-      positions[i + 1] = (Math.random() - 0.5) * 220; // Y
-      positions[i + 2] = (Math.random() - 0.5) * 220; // Z
+      positions[i] = (Math.random() - 0.5) * 220;     
+      positions[i + 1] = (Math.random() - 0.5) * 220; 
+      positions[i + 2] = (Math.random() - 0.5) * 220; 
 
-      // Alternate or mix colors
       const mixedColor = i % 6 === 0 ? colorBlue : colorViolet;
       colors[i] = mixedColor.r;
       colors[i + 1] = mixedColor.g;
@@ -66,7 +52,6 @@ export default function Hero() {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    // Creating a smooth glowing circular texture programmatically
     const createCircleTexture = () => {
       const canvas = document.createElement('canvas');
       canvas.width = 16;
@@ -80,11 +65,9 @@ export default function Hero() {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 16, 16);
       }
-      const texture = new THREE.CanvasTexture(canvas);
-      return texture;
+      return new THREE.CanvasTexture(canvas);
     };
 
-    // Material
     const material = new THREE.PointsMaterial({
       size: 1.5,
       map: createCircleTexture(),
@@ -94,11 +77,9 @@ export default function Hero() {
       vertexColors: true,
     });
 
-    // Points Mesh
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
-    // Mouse movement track
     let mouseX = 0;
     let mouseY = 0;
     let targetX = 0;
@@ -110,31 +91,24 @@ export default function Hero() {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-
-    // Clock for wave animation
     const clock = new THREE.Clock();
-
-    // Render loop
     let animationFrameId: number;
+
     const tick = () => {
       const elapsedTime = clock.getElapsedTime();
 
-      // Rotate cloud slowly
       points.rotation.y = elapsedTime * 0.02;
       points.rotation.x = elapsedTime * 0.01;
 
-      // Smooth mouse interaction (Lerp)
       targetX += (mouseX - targetX) * 0.05;
       targetY += (mouseY - targetY) * 0.05;
 
       points.position.x = targetX * 0.5;
       points.position.y = -targetY * 0.5;
 
-      // Make particles drift slightly
       const positionsArray = geometry.attributes.position.array as Float32Array;
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        // Apply sinusoidal drift
         positionsArray[i3 + 1] += Math.sin(elapsedTime + positionsArray[i3]) * 0.02;
       }
       geometry.attributes.position.needsUpdate = true;
@@ -144,17 +118,14 @@ export default function Hero() {
     };
     tick();
 
-    // Resize Handler
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     };
 
     window.addEventListener('resize', handleResize);
 
-    // Clean up Three.js
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
@@ -166,61 +137,27 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    // --- 2. GSAP Entrance Animations ---
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
 
-      // Fade and slide the small label first
-      tl.fromTo(
-        labelRef.current,
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.3 }
-      );
+      tl.fromTo(labelRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.3 });
 
-      // Phase 1 — "ONE'O'ONE" characters drop in
       tl.fromTo(
         '.hero-char-1',
-        { y: -80, opacity: 0, rotateX: 90, scale: 0.6 },
-        {
-          y: 0,
-          opacity: 1,
-          rotateX: 0,
-          scale: 1,
-          stagger: 0.045,
-          ease: 'back.out(1.4)',
-          duration: 0.6,
-        },
+        { y: -40, opacity: 0, rotateX: 90, scale: 0.6 },
+        { y: 0, opacity: 1, rotateX: 0, scale: 1, stagger: 0.045, ease: 'back.out(1.4)', duration: 0.6 },
         '-=0.3'
       );
 
-      // Phase 2 — Brief pause (0.1s) then "AGENCY" characters rise up
       tl.fromTo(
         '.hero-char-2',
-        { y: 80, opacity: 0, rotateX: -90, scale: 0.6 },
-        {
-          y: 0,
-          opacity: 1,
-          rotateX: 0,
-          scale: 1,
-          stagger: 0.055,
-          ease: 'back.out(1.6)',
-          duration: 0.65,
-        },
+        { y: 40, opacity: 0, rotateX: -90, scale: 0.6 },
+        { y: 0, opacity: 1, rotateX: 0, scale: 1, stagger: 0.055, ease: 'back.out(1.6)', duration: 0.65 },
         '<0.15'
       );
 
-      // Phase 3 — Gradient shimmer sweep on "AGENCY" after it lands
-      tl.fromTo(
-        '.hero-shimmer',
-        { xPercent: -100 },
-        {
-          xPercent: 250,
-          duration: 1.2,
-          ease: 'power2.inOut',
-        }
-      );
+      tl.fromTo('.hero-shimmer', { xPercent: -100 }, { xPercent: 250, duration: 1.2, ease: 'power2.inOut' });
 
-      // Fade and slide subtitle and CTA button
       tl.fromTo(
         [subtitleRef.current, ctaRef.current],
         { opacity: 0, y: 30 },
@@ -228,27 +165,20 @@ export default function Hero() {
         '-=0.8'
       );
 
-      // Phase 4 — Subtle idle float after entrance completes
       tl.eventCallback('onComplete', () => {
-        gsap.to(titleRef.current, {
-          y: -8,
-          duration: 3,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-        });
+        gsap.to(titleRef.current, { y: -8, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1 });
       });
     }, containerRef);
 
-    return () => {
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   useEffect(() => {
-    // --- 3. Magnetic Hover Effect ---
     const btn = ctaRef.current;
     if (!btn) return;
+
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (isMobile) return;
 
     const onButtonMouseMove = (e: MouseEvent) => {
       const rect = btn.getBoundingClientRect();
@@ -261,23 +191,10 @@ export default function Hero() {
       const distance = Math.hypot(distX, distY);
 
       if (distance < 120) {
-        // Pull the button towards cursor
-        gsap.to(btn, {
-          x: distX * 0.35,
-          y: distY * 0.35,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
-        
-        // Secondary effect on internal text
+        gsap.to(btn, { x: distX * 0.35, y: distY * 0.35, duration: 0.3, ease: 'power2.out' });
         const text = btn.querySelector('.btn-text');
         if (text) {
-          gsap.to(text, {
-            x: distX * 0.15,
-            y: distY * 0.15,
-            duration: 0.3,
-            ease: 'power2.out',
-          });
+          gsap.to(text, { x: distX * 0.15, y: distY * 0.15, duration: 0.3, ease: 'power2.out' });
         }
       } else {
         resetBtn();
@@ -285,84 +202,42 @@ export default function Hero() {
     };
 
     const resetBtn = () => {
-      gsap.to(btn, {
-        x: 0,
-        y: 0,
-        duration: 0.6,
-        ease: 'elastic.out(1, 0.3)',
-      });
+      gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' });
       const text = btn.querySelector('.btn-text');
       if (text) {
-        gsap.to(text, {
-          x: 0,
-          y: 0,
-          duration: 0.6,
-          ease: 'elastic.out(1, 0.3)',
-        });
+        gsap.to(text, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' });
       }
     };
 
     window.addEventListener('mousemove', onButtonMouseMove);
-    return () => {
-      window.removeEventListener('mousemove', onButtonMouseMove);
-    };
+    return () => window.removeEventListener('mousemove', onButtonMouseMove);
   }, []);
 
   return (
-    <section 
-      ref={containerRef} 
-      className="relative w-full h-screen overflow-hidden flex flex-col justify-center items-center bg-black"
-    >
-      {/* Background Canvas */}
-      <canvas 
-        ref={canvasRef} 
-        className="absolute top-0 left-0 w-full h-full pointer-events-none z-0" 
-      />
-
-      {/* Radial Gradient Ambient Overlay */}
+    // Fixed: Using 100dvh guarantees mobile browsers don't clip the bottom CTA buttons 
+    <section ref={containerRef} className="relative w-full h-[100dvh] overflow-hidden flex flex-col justify-center items-center bg-black">
+      <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none z-0" />
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.08)_0%,rgba(0,0,0,0.8)_80%)] pointer-events-none z-0" />
       
-      {/* Hero Content */}
-      <div 
-        className="relative z-10 flex flex-col items-center text-center max-w-4xl px-6"
-        style={{ perspective: "800px", perspectiveOrigin: "50% 50%" }}
-      >
-        <span 
-          ref={labelRef} 
-          className="text-xs md:text-sm font-semibold tracking-[0.25em] text-brand-blue mb-4 uppercase drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]"
-        >
+      <div className="relative z-10 flex flex-col items-center text-center max-w-4xl px-4 sm:px-6 w-full" style={{ perspective: "800px", perspectiveOrigin: "50% 50%" }}>
+        <span ref={labelRef} className="text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.25em] text-brand-blue mb-4 uppercase drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">
           Creative Strategy • Performance Marketing
         </span>
 
-        {/* Character split heading */}
-        <h1 
-          ref={titleRef} 
-          className="text-center select-none mb-6 relative"
-        >
+        <h1 ref={titleRef} className="text-center select-none mb-4 sm:mb-6 relative w-full">
           <span 
-            className="block whitespace-nowrap overflow-hidden text-white tracking-tight leading-none py-1" 
+            className="block whitespace-nowrap overflow-hidden text-white tracking-tight leading-none py-1 sm:py-2" 
             id="hero-line-1"
-            style={{ 
-              fontSize: 'clamp(5rem, 12vw, 10rem)', 
-              fontWeight: 900 
-            }}
+            style={{ fontSize: 'clamp(2.5rem, 11vw, 10rem)', fontWeight: 900 }}
           >
             {line1Text.split('').map((char, index) => (
-              <span 
-                key={index} 
-                className="hero-char-1 inline-block"
-              >
-                {char}
-              </span>
+              <span key={index} className="hero-char-1 inline-block">{char}</span>
             ))}
           </span>
           <span 
-            className="block whitespace-nowrap overflow-hidden relative tracking-tight leading-none py-1" 
+            className="block whitespace-nowrap overflow-hidden relative tracking-tight leading-none py-1 sm:py-2" 
             id="hero-line-2"
-            style={{ 
-              fontSize: 'clamp(5rem, 12vw, 10rem)', 
-              fontWeight: 900,
-            }}
+            style={{ fontSize: 'clamp(2.5rem, 11vw, 10rem)', fontWeight: 900 }}
           >
             {line2Text.split('').map((char, index) => (
               <span 
@@ -380,43 +255,25 @@ export default function Hero() {
                 {char}
               </span>
             ))}
-
-            {/* Shimmer overlay */}
-            <div
-              className="hero-shimmer absolute top-0 left-0 h-full w-[60%] pointer-events-none"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)',
-                transform: 'skewX(-15deg) translateX(-100%)',
-                mixBlendMode: 'overlay',
-              }}
-            />
+            <div className="hero-shimmer absolute top-0 left-0 h-full w-[60%] pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)', transform: 'skewX(-15deg) translateX(-100%)', mixBlendMode: 'overlay' }} />
           </span>
         </h1>
 
-        <p 
-          ref={subtitleRef} 
-          className="text-gray-400 text-base sm:text-lg md:text-xl max-w-2xl font-light tracking-wide mb-10 leading-relaxed"
-        >
+        <p ref={subtitleRef} className="text-gray-400 text-xs sm:text-sm md:text-xl max-w-2xl font-light tracking-wide mb-8 sm:mb-10 leading-relaxed px-2">
           We build hyper-dynamic brand experiences and scaling campaigns that turn digital noise into compound revenue.
         </p>
 
-        {/* CTA Button */}
         <button
           ref={ctaRef}
           onClick={() => {
             const el = document.getElementById('how-we-work');
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="group relative flex items-center justify-center px-8 py-4 rounded-full border border-brand-violet/40 bg-brand-violet/10 text-white font-semibold text-sm tracking-widest uppercase transition-all duration-300 shadow-[0_0_20px_rgba(139,92,246,0.15)] hover:shadow-[0_0_35px_rgba(139,92,246,0.45)] hover:border-brand-violet pointer-events-auto"
+          className="group relative flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 rounded-full border border-brand-violet/40 bg-brand-violet/10 text-white font-semibold text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 shadow-[0_0_20px_rgba(139,92,246,0.15)] hover:shadow-[0_0_35px_rgba(139,92,246,0.45)] hover:border-brand-violet pointer-events-auto"
         >
           <span className="btn-text relative z-10 flex items-center gap-2">
             Get Started
-            <svg 
-              className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300 text-brand-blue" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </span>
@@ -424,24 +281,16 @@ export default function Hero() {
         </button>
       </div>
 
-      {/* Ambient neon light corners */}
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-blue/10 blur-[120px] pointer-events-none" />
       <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-brand-violet/10 blur-[120px] pointer-events-none" />
 
-      {/* Scroll Down Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none opacity-60">
-        <span className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">Scroll Down</span>
-        <div className="w-[1.5px] h-10 bg-gradient-to-b from-brand-blue to-transparent relative overflow-hidden rounded">
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none opacity-60">
+        <span className="text-[9px] sm:text-[10px] font-semibold tracking-widest text-gray-500 uppercase">Scroll Down</span>
+        <div className="w-[1.5px] h-8 sm:h-10 bg-gradient-to-b from-brand-blue to-transparent relative overflow-hidden rounded">
           <div className="absolute top-0 left-0 w-full h-[30%] bg-white animate-scroll-indicator" />
         </div>
       </div>
-
       <style jsx global>{`
-        @keyframes scroll-indicator-bounce {
-          0% { transform: translateY(0); }
-          50% { transform: translateY(6px); }
-          100% { transform: translateY(0); }
-        }
         @keyframes scroll-indicator-line {
           0% { top: -100%; }
           70% { top: 100%; }

@@ -9,6 +9,7 @@ import Reviews from "@/components/Reviews";
 import FAQ from "@/components/FAQ";
 import TurnaroundPromise from "@/components/TurnaroundPromise";
 import ContactFooter from "@/components/ContactFooter";
+import MagneticCore from "@/components/MagneticCore";
 
 export default function Home() {
   return (
@@ -19,9 +20,10 @@ export default function Home() {
         <div className="relative z-10 bg-black w-full shadow-[0_15px_30px_rgba(0,0,0,0.8)]">
           <Hero />
           <HowWeWork />
+          <OurWork />
+          <MagneticCore />
           <FoundersNote />
           <WhyChooseUs />
-          <OurWork />
           <Reviews />
           <FAQ />
           <TurnaroundPromise />

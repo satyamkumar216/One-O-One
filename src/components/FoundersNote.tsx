@@ -6,99 +6,129 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export default function FoundersNote() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLHeadingElement>(null);
-  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
+
+  const headline = "We started with 3 brands. Not because we couldn't find more — because we only take work we can win.";
+  const body = "Most agencies take every client they can get. We don't. When we partner with a brand, we go all in — strategy, creatives, execution, and obsessive optimization. That's why our first 3 brands saw real results. And why the next ones will too.";
+
+  // Combine and split text for individual word manipulation
+  const allWords = [...headline.split(' '), ...body.split(' ')];
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-
     const section = sectionRef.current;
     if (!section) return;
 
-    // Timeline for staggered reveal
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: 'top 80%',
-        once: true,
-      }
-    });
+    const ctx = gsap.context(() => {
+      // 1. Scroll Scrub Reveal: Words light up as you scroll down
+      gsap.fromTo(
+        wordsRef.current,
+        { opacity: 0.15, filter: 'blur(4px)' },
+        {
+          opacity: 1,
+          filter: 'blur(0px)',
+          stagger: 0.05,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 60%',
+            end: 'bottom 80%',
+            scrub: true,
+          }
+        }
+      );
+    }, sectionRef);
 
-    // Reveal the three headline lines
-    tl.fromTo(
-      '.founders-line',
-      { opacity: 0, y: 40 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.8, 
-        stagger: 0.15, 
-        ease: 'power3.out' 
-      }
-    );
+    // 2. Magnetic Cursor Repel Physics
+    const handleMouseMove = (e: MouseEvent) => {
+      // Disable hover physics on mobile to preserve performance
+      if (window.innerWidth < 768) return; 
 
-    // Reveal the body paragraph 0.3s after the headline completes
-    tl.fromTo(
-      bodyRef.current,
-      { opacity: 0 },
-      { 
-        opacity: 1, 
-        duration: 0.6, 
-        ease: 'power2.out' 
-      },
-      '+=0.3'
-    );
+      const { clientX, clientY } = e;
+      
+      wordsRef.current.forEach((word) => {
+        if (!word) return;
+        const rect = word.getBoundingClientRect();
+        const wordX = rect.left + rect.width / 2;
+        const wordY = rect.top + rect.height / 2;
+        
+        // Calculate distance from cursor to word
+        const dist = Math.hypot(clientX - wordX, clientY - wordY);
+        const radius = 120; // Magnetic field radius
+
+        if (dist < radius) {
+          // Push words away based on proximity
+          const angle = Math.atan2(wordY - clientY, wordX - clientX);
+          const force = (radius - dist) / radius;
+          
+          gsap.to(word, {
+            x: Math.cos(angle) * force * 30,
+            y: Math.sin(angle) * force * 30,
+            color: '#00f0ff', // Lights up brand blue on hover
+            duration: 0.3,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
+        } else {
+          // Snap back to original position
+          gsap.to(word, {
+            x: 0,
+            y: 0,
+            color: 'inherit',
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.3)',
+            overwrite: 'auto'
+          });
+        }
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      ctx.revert();
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   return (
     <section 
+      id="founders-note"
       ref={sectionRef} 
-      className="relative w-full bg-[#0d0d11] py-28 px-6 overflow-hidden"
+      className="relative w-full bg-[#0d0d11] py-32 px-6 overflow-hidden min-h-[80vh] flex items-center justify-center border-t border-white/5"
     >
-      {/* Centered subtle radial gradient glow behind text */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-violet/10 blur-[120px] pointer-events-none z-0" 
-      />
+      {/* Ambient background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.1)_0%,rgba(0,0,0,0)_70%)] pointer-events-none z-0" />
 
-      <div className="max-w-5xl mx-auto relative z-10 space-y-8">
+      <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center">
         
-        {/* Overline Label */}
-        <span className="inline-block text-[12px] font-semibold tracking-[0.25em] text-brand-blue uppercase drop-shadow-[0_0_8px_rgba(0,240,255,0.3)]">
+        <span className="inline-block text-[12px] font-semibold tracking-[0.25em] text-brand-blue uppercase drop-shadow-[0_0_8px_rgba(0,240,255,0.3)] mb-12">
           WHY ONE'O'ONE
         </span>
 
-        {/* Headline */}
-        <h2 
-          ref={headlineRef} 
-          className="flex flex-col text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight"
-        >
-          <span className="founders-line opacity-0 inline-block">
-            We started with 3 brands.
-          </span>
-          <span className="founders-line opacity-0 inline-block text-white/60">
-            Not because we couldn't find more —
-          </span>
-          <span className="founders-line opacity-0 inline-block text-transparent bg-clip-text bg-gradient-to-r from-brand-violet to-brand-blue">
-            because we only take work we can win.
-          </span>
-        </h2>
-
-        {/* Body Paragraph */}
-        <p 
-          ref={bodyRef} 
-          className="text-gray-400 text-base sm:text-lg max-w-2xl font-light leading-relaxed opacity-0 pt-4"
-        >
-          Most agencies take every client they can get. We don't. When we partner 
-          with a brand, we go all in — strategy, creatives, execution, and obsessive 
-          optimization. That's why our first 3 brands saw real results. And why the 
-          next ones will too.
-        </p>
-
-        {/* Subtle Horizontal Rule */}
-        <div className="pt-8">
-          <hr className="border-t border-brand-blue/20 w-full" />
+        {/* Dynamic Interactive Text Grid */}
+        <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 md:gap-x-4 md:gap-y-4 text-center cursor-default">
+          {allWords.map((word, i) => {
+            // Differentiate headline styling from body styling
+            const isHeadline = i < headline.split(' ').length;
+            
+            return (
+              <span
+                key={i}
+                ref={(el) => {
+                  wordsRef.current[i] = el;
+                }}
+                className={`inline-block transition-colors duration-200 ${
+                  isHeadline 
+                    ? 'text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white' 
+                    : 'text-xl sm:text-2xl md:text-3xl font-light text-gray-300'
+                }`}
+              >
+                {word}
+              </span>
+            );
+          })}
         </div>
-
       </div>
     </section>
   );

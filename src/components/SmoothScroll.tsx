@@ -19,6 +19,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
+      touchMultiplier: 0, // Disables JS-hijacked scrolling on phones for native feel
     });
 
     lenisRef.current = lenis;
