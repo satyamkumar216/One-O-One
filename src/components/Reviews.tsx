@@ -170,7 +170,7 @@ export default function Reviews() {
 
                   {/* Quote - italic, rgba(255,255,255,0.75) */}
                   <p className="text-[rgba(255,255,255,0.75)] text-xs sm:text-sm italic font-light leading-relaxed">
-                    "{rev.quote}"
+                    &quot;{rev.quote}&quot;
                   </p>
                 </div>
 

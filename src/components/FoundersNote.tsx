@@ -107,7 +107,7 @@ export default function FoundersNote() {
       <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center">
         
         <span className="inline-block text-[11px] font-semibold tracking-[0.12em] text-brand-blue uppercase drop-shadow-[0_0_8px_rgba(0,240,255,0.3)] mb-12">
-          WHY ONE'O'ONE
+          {"WHY ONE'O'ONE"}
         </span>
 
         {/* Dynamic Interactive Text Grid */}

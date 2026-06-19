@@ -169,13 +169,13 @@ export default function WhatWeveBuilt() {
             OUR WORK
           </span>
           <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-4">
-            What <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#7C3AED]">We've Built</span>
+            What <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#7C3AED]">{"We've Built"}</span>
           </h2>
         </div>
 
         {/* Quietly confident intro */}
         <p className="text-[rgba(255,255,255,0.75)] text-sm md:text-base font-light text-center max-w-lg leading-relaxed">
-          We're early. But every project we've shipped has been delivered with full seriousness.
+          We&apos;re early. But every project we&apos;ve shipped has been delivered with full seriousness.
         </p>
 
         {/* Project Cards Grid */}
@@ -230,7 +230,7 @@ export default function WhatWeveBuilt() {
 
         {/* Quiet Trust Line */}
         <p className="mt-14 text-center text-[rgba(255,255,255,0.40)] text-[13px] font-light tracking-wide max-w-md">
-          These are real projects, built for real clients. We're growing — and we take every project seriously regardless of size.
+          These are real projects, built for real clients. We&apos;re growing — and we take every project seriously regardless of size.
         </p>
       </div>
 

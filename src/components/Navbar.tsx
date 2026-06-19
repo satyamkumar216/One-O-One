@@ -64,7 +64,7 @@ export default function Navbar() {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
-            ONE'O'ONE
+            {"ONE'O'ONE"}
             <span className="text-brand-blue">.</span>
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-brand-blue transition-all duration-300 group-hover:w-full shadow-[0_0_8px_#00f0ff]" />
           </a>

@@ -62,7 +62,7 @@ export default function ContactFooter() {
                   GET IN TOUCH
                 </span>
                 <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
-                  Let's Build <br />Something <br />
+                  Let&apos;s Build <br />Something <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B4D8] to-[#7C3AED]">
                     Uncompromising
                   </span>
@@ -70,7 +70,7 @@ export default function ContactFooter() {
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">// Why reach out</h4>
+                <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Why reach out</h4>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3 text-[rgba(255,255,255,0.70)] text-sm">
                     <svg className="w-4 h-4 text-[#00B4D8] shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -204,7 +204,7 @@ export default function ContactFooter() {
               onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className="text-xl font-extrabold text-white tracking-widest uppercase hover:text-brand-blue transition-colors duration-200"
             >
-              ONE'O'ONE<span className="text-brand-blue">.</span>
+              ONE&apos;O&apos;ONE<span className="text-brand-blue">.</span>
             </a>
             <p className="text-xs font-light text-zinc-500">
               Building things that work.
@@ -221,7 +221,7 @@ export default function ContactFooter() {
             </a>
             <span className="hidden sm:inline text-zinc-800">|</span>
             <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-              © {new Date().getFullYear()} ONE'O'ONE
+              © {new Date().getFullYear()} ONE&apos;O&apos;ONE
             </span>
           </div>
         </div>
