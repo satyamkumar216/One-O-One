@@ -9,14 +9,16 @@ const gsapInstance = gsapDefault;
 export default function ContactFooter() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', details: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const submitBtnRef = useRef<HTMLButtonElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.details) return;
+    setSubmitError(null);
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('enquiries')
         .insert([
           {
@@ -25,20 +27,24 @@ export default function ContactFooter() {
             phone: formData.phone || null,
             details: formData.details,
           }
-        ]);
+        ])
+        .select();
 
       if (error) {
-        console.error('Error saving enquiry to Supabase:', error.message);
+        console.error('Supabase insert error:', error);
+        setSubmitError(error.message || 'Failed to submit enquiry. Please try again.');
+      } else {
+        console.log('Success:', data);
+        setSubmitted(true);
+        setFormData({ name: '', email: '', phone: '', details: '' });
+        setTimeout(() => {
+          setSubmitted(false);
+        }, 5000);
       }
     } catch (err) {
-      console.error('Failed to submit enquiry to Supabase:', err);
+      console.error('Supabase insert error:', err);
+      setSubmitError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     }
-
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: '', email: '', phone: '', details: '' });
-    }, 3000);
   };
 
   const handleSubmitHoverEnter = () => {
@@ -190,6 +196,12 @@ export default function ContactFooter() {
                         placeholder="Looking to build a custom internal tool..."
                       />
                     </div>
+
+                    {submitError && (
+                      <p className="text-xs text-red-400 font-medium bg-red-950/20 border border-red-900/35 rounded-lg px-3.5 py-2.5">
+                        {submitError}
+                      </p>
+                    )}
 
                     {/* Submit button */}
                     <div className="pt-4 flex justify-center md:justify-end">
