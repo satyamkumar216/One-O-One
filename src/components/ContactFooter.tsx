@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { default as gsapDefault } from 'gsap';
+import { supabase } from '@/lib/supabase';
 
 const gsapInstance = gsapDefault;
 
@@ -10,9 +11,29 @@ export default function ContactFooter() {
   const [submitted, setSubmitted] = useState(false);
   const submitBtnRef = useRef<HTMLButtonElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.details) return;
+
+    try {
+      const { error } = await supabase
+        .from('enquiries')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone || null,
+            details: formData.details,
+          }
+        ]);
+
+      if (error) {
+        console.error('Error saving enquiry to Supabase:', error.message);
+      }
+    } catch (err) {
+      console.error('Failed to submit enquiry to Supabase:', err);
+    }
+
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
@@ -151,7 +172,7 @@ export default function ContactFooter() {
                         value={formData.phone}
                         onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                         className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.10)] rounded-xl px-4 py-3 text-white text-sm font-medium focus:outline-none focus:border-[#00B4D8] focus:ring-4 focus:ring-[#00B4D8]/15 transition-all duration-300 placeholder:text-zinc-600"
-                        placeholder="+91 98765 43210"
+                        placeholder="98765 43210"
                       />
                     </div>
 
